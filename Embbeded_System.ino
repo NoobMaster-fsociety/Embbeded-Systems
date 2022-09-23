@@ -36,6 +36,8 @@ void setup() {
 
 void loop() {
 
+
+
 //LCD print  
   LCD_PRINT(
     tankLevel(Trig1,Echo1), //sonar 1
@@ -89,6 +91,9 @@ void LCD_PRINT(
   floatss1? lcd.print("Tank 1 is not full") : lcd.print("Tank 1 is full");
   lcd.setCursor(0,3);
   floatss2? lcd.print("Tank 2 is not full") : lcd.print("Tank 2 is full");
+
+
+  turnOff(floatss1,floatss2);
   delay(1000);
 }
 
@@ -151,6 +156,15 @@ float phLevel(){
 
 //turn off the water tank
 void turnOff(int Floats1, int Floats2){
-  Serial.println(Floats1);
-
+  if (!Floats1){
+     Serial.println("Turn OFF WATER pump");
+  }else{
+    Serial.println("Turn On WATER pump");
+  }
+ 
+  if (!Floats2){
+     Serial.println("Solenoid valve off");
+  }else{
+    Serial.println("Solenoid valve On");
+  }
 }
