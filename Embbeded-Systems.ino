@@ -2,6 +2,8 @@
 
 LiquidCrystal_I2C lcd(0x27,20,4); 
 
+//updated
+
 //Sonar Sensor 1
 int Trig1 = 2;
 int Echo1 = 3;
