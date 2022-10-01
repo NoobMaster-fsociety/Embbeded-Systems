@@ -1,6 +1,6 @@
 #include <LiquidCrystal_I2C.h>
 
-LiquidCrystal_I2C lcd(0x27,20,4); //Edit moto pag nahinang muna i2c
+LiquidCrystal_I2C lcd(0x27,20,4); 
 
 //Sonar Sensor 1
 int Trig1 = 2;
@@ -17,6 +17,12 @@ int Float2 = 7; //float switch 2
 //Ph sensor analog pin
 int phSensor = A0;
 
+//water pump
+int waterPump = 8;
+
+//solenoid valve
+int valve = 9;
+
 
 void setup() {
   Serial.begin(9600);
@@ -32,6 +38,12 @@ void setup() {
 //float sensor
   pinMode(Float1, INPUT_PULLUP);
   pinMode(Float2, INPUT_PULLUP);
+
+//water pump
+  pinMode(waterPump, OUTPUT);
+
+//solenoid valve  
+  pinMode(valve, OUTPUT);
 }
 
 void loop() {
@@ -40,8 +52,8 @@ void loop() {
 
 //LCD print  
   LCD_PRINT(
-    tankLevel(Trig1,Echo1), //sonar 1
-    tankLevel(Trig2,Echo2), //sonar 2
+    tankLevel(Trig1,Echo1,21,digitalRead(Float1)), //sonar 1
+    tankLevel(Trig2,Echo2,20,digitalRead(Float2)), //sonar 2
     phLevel(), //Ph Level
     100, //Humidity
     100,  //Tenperature
@@ -100,7 +112,7 @@ void LCD_PRINT(
 // Group 1: Tank Filteration 
 
 //for tank level
-int tankLevel(int Trig, int Echo){
+int tankLevel(int Trig, int Echo, int lvel, int floatLevel){
   
   digitalWrite(Trig, LOW);
   delayMicroseconds(2);
@@ -112,7 +124,15 @@ int tankLevel(int Trig, int Echo){
   long duration = pulseIn(Echo, HIGH);
 
 //return an inches
-    return duration / 74 / 2;
+  int inches = duration / 74 / 2;
+
+  if (floatLevel){
+    return inches * 100 / lvel;
+  }else{
+    return 100;
+  }
+
+    // return inches;
 }
 
 
@@ -157,14 +177,18 @@ float phLevel(){
 //turn off the water tank
 void turnOff(int Floats1, int Floats2){
   if (!Floats1){
+    digitalWrite(waterPump,LOW);
      Serial.println("Turn OFF WATER pump");
   }else{
+  digitalWrite(waterPump,HIGH);
     Serial.println("Turn On WATER pump");
   }
  
   if (!Floats2){
+    digitalWrite(valve,LOW);
      Serial.println("Solenoid valve off");
   }else{
+    digitalWrite(valve,HIGH);
     Serial.println("Solenoid valve On");
   }
 }
